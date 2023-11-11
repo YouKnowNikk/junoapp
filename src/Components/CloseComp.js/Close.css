@@ -1,0 +1,30 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+.popUpStyle{
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    width: 40%;
+    min-height:60vh;
+    border-radius: 10px;
+  }
+  .heading{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 2% 4%;
+  }
+  .heading h3{
+    font-weight: 400;
+    cursor: pointer;
+  }
+  .heading h3:hover{
+    background-color: rgb(234, 231, 228);
+  }
