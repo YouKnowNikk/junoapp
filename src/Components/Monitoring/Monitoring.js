@@ -76,19 +76,19 @@ function Monitoring() {
     ];
 
     const [pending, setPending] = useState(false);
-    const [Completed, setCompleted] = useState(false)
+    const [completed, setCompleted] = useState(false)
     const [showclose, setShowClose] = useState(false)
     const [overlayVisible, setOverlayVisible] = useState(false);
-    // const [searchText, setSearchText] = useState('');
-    const [selectedRiskLevel, setSelectedRiskLevel] = useState(null);
+    const [searchText, setSearchText] = useState('');
+    const [selectedRiskLevel, setSelectedRiskLevel] = useState("");
+    const [selectedTriggerReason, setSelectedTriggerReason] = useState("");
     // const [filteredUserArray, setFilteredUserArray] = useState([]);
-
     const setPendingState = () => {
         setPending(!pending)
         setCompleted(false)
     }
     const setCompletedState = () => {
-        setCompleted(!Completed);
+        setCompleted(!completed);
         setPending(false)
     }
     const ShowCloseSetter = () => {
@@ -99,134 +99,91 @@ function Monitoring() {
         setShowClose(false);
         setOverlayVisible(false);
     }
-    // const handleSearch = (value) => {
-    //     setSearchText(value);
-
-    //     // Optionally, you can filter the data based on the search text here
-    //     // For example, to filter by username or useremail:
-    //     const filteredBySearch = userArray.filter(
-    //       (user) =>
-    //         user.username.toLowerCase().includes(value.toLowerCase()) ||
-    //         user.useremail.toLowerCase().includes(value.toLowerCase())
-    //     );
-
-    //     // Combine the search filter with other filters if needed
-    //     const combinedFilters = filteredBySearch.filter((user) => {
-    //       const riskLevelMatch =
-    //         selectedRiskLevel === null || user.risklevel === selectedRiskLevel.value;
-
-    //       if (pending && user.status === 'pending') {
-    //         return riskLevelMatch;
-    //       }
-
-    //       if (Completed && user.status === 'complete') {
-    //         return riskLevelMatch;
-    //       }
-
-    //       if (selectedRiskLevel && selectedRiskLevel.value === 'null') {
-    //         return true;
-    //       }
-
-    //       if (!Completed && !pending && riskLevelMatch) {
-    //         return true;
-    //       }
-
-    //       return false;
-    //     });
-
-    //     setFilteredUserArray(combinedFilters);
-    //   };
-    const handleChange = (value, option) => {
-        setSelectedRiskLevel(option);
+    const handleRiskLevelChange = (value) => {
+        setSelectedRiskLevel(value);
     };
-    const filteredUserArray = userArray.filter((user) => {
-        const riskLevelMatch =
-            selectedRiskLevel === null || user.risklevel === selectedRiskLevel.value;
+    const handleTriggerReasonChange = (value) => {
+        setSelectedTriggerReason(value);
+    };
+    const handleSearch = (value) => {
+        setSearchText(value);
+    };
+    let filteredArray = userArray.filter((user) => {
+        const matchesCompleted = completed ? user.status === 'complete' : true;
+        const matchesPending = pending ? user.status === 'pending' : true;
+        const matchesRiskLevel = selectedRiskLevel !== '' ? user.risklevel === selectedRiskLevel : true;
+        const matchesTriggerReason = selectedTriggerReason !== '' ? user.triggerReason === selectedTriggerReason : true;
+        const matchesUsername = user.username.toLowerCase().includes(searchText.toLowerCase());
 
-        if (pending && user.status === 'pending') {
-            return riskLevelMatch;
-        }
-
-        if (Completed && user.status === 'complete') {
-            return riskLevelMatch;
-        }
-
-        if (selectedRiskLevel && selectedRiskLevel.value === 'null') {
-            return true;
-        }
-
-        if (!Completed && !pending && riskLevelMatch) {
-            return true;
-        }
-
-        return false;
+        return matchesCompleted && matchesPending && matchesRiskLevel && matchesTriggerReason && matchesUsername;
     });
 
+    
 
     return (
         <>
-          <div>
-          {overlayVisible && <div className="overlay" />}
-            <h2 className='title'>Monitoring</h2>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginLeft: '2%', marginTop: '2%' }}>
-                <div style={{ display: 'flex'}} >
-                    <p className='offSet' style={{ marginLeft: '10%', color: pending ? 'blue' : 'grey', textDecoration: pending ? 'underline' : 'none', textUnderlineOffset: '37px', textDecorationThickness: '4px', zIndex: '5', cursor: 'pointer' }} onClick={setPendingState}>Pending</p>
-                    <p  className='offSet' style={{ marginLeft: '10%', color: Completed ? 'blue' : 'grey', textDecoration: Completed ? 'underline' : 'none', textUnderlineOffset: '37px', textDecorationThickness: '4px', zIndex: '5', cursor: 'pointer' }} onClick={setCompletedState}>Completed</p>
-                </div>
-                <div style={{ backgroundColor: '#f6d8d8', marginRight: '2%', borderRadius: '10px' }} onClick={ShowCloseSetter} >
-                    <p style={{ margin: '2px', padding: '6px', color: '#d13b3b', cursor: 'pointer' }}><CloseCircleOutlined /> Close account</p>
-                </div>
-
-            </div>
-            <hr style={{ marginLeft: '3%', marginTop: '2%' }} />
-            {showclose ? <Close closeCloseSetter={closeCloseSetter} /> : null}
-            <div className='selectionDiv'>
-                <Search
-                    className="search"
-                    placeholder="search user"
-                    // value={searchText}
-                    // onChange={(e) => handleSearch(e.target.value)}
-                    // onSearch={handleSearch}
-                    style={{ width: 300, marginBottom: '2%' }}
-                />
-                <div style={{ display: 'flex', flexDirection: 'row' }}>
-                    <div >
-                        <Select
-                            className='selection'
-                            defaultValue="Trigger-Reason"
-                            style={{ width: 140 }}
-                            onChange={handleChange}
-                            options={[
-                                { value: 'Trigger-Reason', label: 'Trigger-Reason' },
-                                { value: 'Hard Flag', label: 'Hard Flag' },
-                                { value: 'Temp Flag', label: 'Temp Flag' },
-                                { value: 'Restricted Unflag', label: 'Restricted Unflag' },
-                                { value: 'unflag', label: 'unflag' },
-                                { value: 'Reviewd', label: 'Reviewd' }
-                            ]}
-                        />
+            <div>
+                {overlayVisible && <div className="overlay" />}
+                <h2 className='title'>Monitoring</h2>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginLeft: '2%', marginTop: '2%' }}>
+                    <div style={{ display: 'flex' }} >
+                        <p className='offSet' style={{ marginLeft: '10%', color: pending ? 'blue' : 'grey', textDecoration: pending ? 'underline' : 'none', textUnderlineOffset: '37px', textDecorationThickness: '4px', zIndex: '5', cursor: 'pointer' }} onClick={setPendingState}>Pending</p>
+                        <p className='offSet' style={{ marginLeft: '10%', color: completed ? 'blue' : 'grey', textDecoration: completed ? 'underline' : 'none', textUnderlineOffset: '37px', textDecorationThickness: '4px', zIndex: '5', cursor: 'pointer' }} onClick={setCompletedState}>Completed</p>
                     </div>
-                    <div >
-                        <Select
+                    <div style={{ backgroundColor: '#f6d8d8', marginRight: '2%', borderRadius: '10px' }} onClick={ShowCloseSetter} >
+                        <p style={{ margin: '2px', padding: '6px', color: '#d13b3b', cursor: 'pointer' }}><CloseCircleOutlined /> Close account</p>
+                    </div>
 
-                            defaultValue="Risk Level"
-                            style={{ width: 140, marginLeft: '20%' }}
-                            onChange={handleChange}
-                            options={[
-                                { value: 'null', label: 'Risk Level' },
-                                { value: 'high', label: 'High' },
-                                { value: 'medium', label: 'Medium' },
-                                { value: 'low', label: 'Low' },
-                            ]}
-                        />
+                </div>
+                <hr style={{ marginLeft: '3%', marginTop: '2%' }} />
+                {showclose ? <Close closeCloseSetter={closeCloseSetter} /> : null}
+                <div className='selectionDiv'>
+                    <Search
+                        className="search"
+                        placeholder="search user"
+                        value={searchText}
+                        onChange={(e) => handleSearch(e.target.value)}
+                        style={{ width: 300, marginBottom: '2%' }}
+                    />
+                    <div style={{ display: 'flex', flexDirection: 'row' }}>
+                        <div >
+                            <Select
+                                className='selection'
+                                defaultValue=""
+                                style={{ width: 140 }}
+                                onChange={handleTriggerReasonChange}
+                                options={[
+                                    { value: '', label: 'Trigger-Reason' },
+                                    { value: 'Hard Flag', label: 'Hard Flag' },
+                                    { value: 'Temp Flag', label: 'Temp Flag' },
+                                    { value: 'Restricted Unflag', label: 'Restricted Unflag' },
+                                    { value: 'unflag', label: 'unflag' },
+                                    { value: 'Reviewd', label: 'Reviewd' },
+
+                                ]}
+                            />
+                        </div>
+                        <div >
+                            <Select
+
+                                defaultValue=""
+                                style={{ width: 140, marginLeft: '20%' }}
+                                onChange={handleRiskLevelChange}
+                                options={[
+                                    { value: '', label: 'Risk Level' },
+                                    { value: 'high', label: 'High' },
+                                    { value: 'medium', label: 'Medium' },
+                                    { value: 'low', label: 'Low' },
+                                ]}
+                            />
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div style={{ marginBottom: '4%'}}>
-                <UserTable data={filteredUserArray} />
-            </div>
+                <div style={{ marginBottom: '4%' }}>
+                    <UserTable data={filteredArray} />
+                </div>
 
-          </div>
+            </div>
         </>
     )
 }
